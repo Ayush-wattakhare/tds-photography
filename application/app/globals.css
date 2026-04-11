@@ -1,3 +1,33 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html,
+  body {
+    background-color: #eeece2;
+    font-family: 'Jost', 'Inter', sans-serif;
+    color: #1a1a1a;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+@layer utilities {
+  .line-through-price {
+    text-decoration: line-through;
+    text-decoration-color: #1a1a1a;
+    text-decoration-thickness: 1.5px;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white;
+  }
+}

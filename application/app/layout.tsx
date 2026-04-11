@@ -1,26 +1,25 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Jost } from 'next/font/google'
 import './globals.css'
-
-const inter = Inter({ subsets: ['latin'], weight: ['300', '400', '500', '600'] })
 import { QueryProvider } from '@/lib/query-provider'
 
+const jost = Jost({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700'] })
+
 export const metadata: Metadata = {
-  title: 'application',
-  description: 'Built with DevStart CLI',
+  title: 'TDS Photography | Quotation Generator',
+  description: 'Generate professional photography quotations for TDS Photography',
   icons: {
-    icon: '/icon.svg',
+    icon: '/logo.png',
+    apple: '/logo.png',
   },
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={inter.className}><QueryProvider>{children}</QueryProvider></body>
+      <body className={jost.className}>
+        <QueryProvider>{children}</QueryProvider>
+      </body>
     </html>
   )
 }
