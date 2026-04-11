@@ -134,7 +134,7 @@ export default function QuotationPreview({ data, previewRef }: Props) {
       {/* ── Table ── */}
       <div
         style={{
-          backgroundColor: '#B5A98A',
+          backgroundColor: '#C8BFA4',
           borderRadius: '3px',
           overflow: 'hidden',
           marginBottom: '44px',
@@ -181,7 +181,7 @@ export default function QuotationPreview({ data, previewRef }: Props) {
                 marginBottom: '10px',
               }}
             >
-              <div style={{ fontSize: '14px', color: '#1A1A1A', fontFamily: font }}>
+              <div style={{ fontSize: '14px', color: '#4A4238', fontFamily: font }}>
                 {item.description}
               </div>
               <div style={{ fontSize: '14px', color: '#1A1A1A', textAlign: 'center', fontFamily: font }}>
@@ -199,56 +199,55 @@ export default function QuotationPreview({ data, previewRef }: Props) {
           ))}
         </div>
 
-        {/* Divider + Totals */}
-        <div style={{ padding: '10px 24px 24px 24px' }}>
-          {/* Divider line right-aligned */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
-            <div
-              style={{
-                borderTop: '1.5px solid #6B5F3E',
-                width: hasDiscount ? '230px' : '120px',
-              }}
-            />
-          </div>
-
-          {/*
-            Correct order matching Rehan's original:
-            Left: final/discounted amount (normal)
-            Right: original total (strikethrough)
-          */}
+        {/* Divider + Totals — use same grid so amounts align under "Total" column */}
+        <div style={{ padding: '8px 24px 24px 24px' }}>
+          {/* Divider: grid row, divider only under the last column */}
           <div
             style={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              alignItems: 'center',
-              gap: '18px',
+              display: 'grid',
+              gridTemplateColumns: '2.2fr 1fr 1.1fr 1.3fr',
+              marginBottom: '8px',
             }}
           >
+            <div /><div /><div />
+            <div style={{ borderTop: '1.5px solid #6B5F3E' }} />
+          </div>
+
+          {/* Amounts: same grid — sits perfectly centred under "Total" header */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '2.2fr 1fr 1.1fr 1.3fr',
+            }}
+          >
+            <div /><div /><div />
             <div
               style={{
-                fontSize: '15px',
-                fontWeight: '500',
-                color: '#1A1A1A',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '14px',
                 fontFamily: font,
               }}
             >
-              {formatMoney(finalAmount)}/-
+              <span style={{ fontSize: '15px', fontWeight: '500', color: '#1A1A1A' }}>
+                {formatMoney(finalAmount)}/-
+              </span>
+              {hasDiscount && (
+                <span
+                  style={{
+                    fontSize: '15px',
+                    fontWeight: '400',
+                    color: '#1A1A1A',
+                    textDecoration: 'line-through',
+                    textDecorationColor: '#1A1A1A',
+                    textDecorationThickness: '1.5px',
+                  }}
+                >
+                  {formatMoney(rawTotal)}/-
+                </span>
+              )}
             </div>
-            {hasDiscount && (
-              <div
-                style={{
-                  fontSize: '15px',
-                  fontWeight: '400',
-                  color: '#1A1A1A',
-                  fontFamily: font,
-                  textDecoration: 'line-through',
-                  textDecorationColor: '#1A1A1A',
-                  textDecorationThickness: '1.5px',
-                }}
-              >
-                {formatMoney(rawTotal)}/-
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -308,7 +307,7 @@ export default function QuotationPreview({ data, previewRef }: Props) {
             <div
               style={{ fontWeight: '700', fontSize: '12.5px', marginBottom: '5px', fontFamily: font }}
             >
-              Rehan Tank
+              Ar. Rehan Tank
             </div>
             <div style={{ fontSize: '11.5px', color: '#1A1A1A', marginBottom: '3px', fontFamily: font }}>
               Phn : +91 7755930601

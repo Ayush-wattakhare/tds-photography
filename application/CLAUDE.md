@@ -31,10 +31,11 @@ app/
 | Token | Value | Usage |
 |---|---|---|
 | `cream` | `#EEECE2` | Page background, quotation background |
-| `tan` | `#B5A98A` | Table background |
-| `tan-dark` | `#8C7E5E` | Dividers, borders |
+| `tan` | `#C8BFA4` | Table background (lightened from original `#B5A98A`) |
+| `tan-dark` | `#8C7E5E` | Dividers, borders, divider line in table |
 | `olive` | `#7A6A3E` | Accent headings ("QUOTATION FOR"), buttons |
-| Body text | `#1A1A1A` | All body copy |
+| Body text | `#1A1A1A` | Numbers, headers, footer |
+| Description text | `#4A4238` | Row description text (slightly lighter than body) |
 | Subtle border | `#C8BFAA` | Note box border, form inputs |
 
 **Font:** Jost (Google Fonts) — closest free match to "Now" used in Rehan's Canva template.
@@ -104,14 +105,17 @@ Do NOT use html2canvas, jsPDF, or any canvas-based approach. They all fail in th
   └────────────────────────────────────────────────┘
 
   ────────────────────────────────────────────────
-  TDS_Photography          Rehan Tank
+  TDS_Photography          Ar. Rehan Tank
   [website] [instagram]    Phn / email
 ```
+
+**Total row alignment:** Uses the same `gridTemplateColumns: '2.2fr 1fr 1.1fr 1.3fr'` as header/body rows so the amount sits perfectly centred under the "Total" column header. Three empty `<div />`s fill the first three columns.
 
 **Discount display order** (matching original):
 - Left: final discounted amount (normal text)
 - Right: original sum (strikethrough)
 - e.g. `28,000/-   ~~35,000/-~~`
+- When no discount: only the total shown, centred under "Total" column
 
 ---
 
@@ -122,7 +126,7 @@ Do NOT use html2canvas, jsPDF, or any canvas-based approach. They all fail in th
 | Brand | TDS_Photography |
 | Website | https://tdsphotography69.mypixieset.com/ |
 | Instagram | tds.photography23 |
-| Owner | Rehan Tank |
+| Owner | Ar. Rehan Tank |
 | Phone | +91 7755930601 |
 | Email | tds.photography23@gmail.com |
 
