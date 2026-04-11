@@ -15,19 +15,39 @@
   }
 }
 
-@layer utilities {
-  .line-through-price {
-    text-decoration: line-through;
-    text-decoration-color: #1a1a1a;
-    text-decoration-thickness: 1.5px;
-  }
-}
-
 @media print {
+  /* Hide only the UI chrome — form, topbar, buttons */
   .no-print {
     display: none !important;
   }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  html,
   body {
-    background: white;
+    margin: 0;
+    padding: 0;
+    background: #eeece2 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Lock preview to exactly one A4 page */
+  #quotation-preview {
+    width: 210mm !important;
+    height: 297mm !important;
+    min-height: unset !important;
+    overflow: hidden !important;
+    background: #eeece2 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
 }
