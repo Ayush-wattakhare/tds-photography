@@ -49,21 +49,28 @@ export default function FormPanel({ data, onChange, onDownload, downloading }: P
         noteText: data.noteText,
       }
 
+      console.log('Saving quotation with payload:', payload)
+
       const response = await fetch('/api/quotations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
 
+      console.log('Response status:', response.status)
+
+      const responseData = await response.json()
+      console.log('Response data:', responseData)
+
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Failed to save quotation')
+        throw new Error(responseData.error || 'Failed to save quotation')
       }
 
+      console.log('✅ Quotation saved successfully!')
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 3000)
     } catch (error) {
-      console.error('Error saving quotation:', error)
+      console.error('❌ Error saving quotation:', error)
       alert(error instanceof Error ? error.message : 'Failed to save quotation')
     } finally {
       setSaving(false)
