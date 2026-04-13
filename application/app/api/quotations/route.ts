@@ -13,15 +13,11 @@ export async function POST(request: Request) {
     // Validate with Zod
     const validatedData = createQuotationSchema.parse(body)
 
-    // Calculate values
-    const subtotal = validatedData.items.reduce((sum, item) => {
-      const price = parseFloat(item.total.replace(/,/g, '')) || 0
-      return sum + price
-    }, 0)
-
-    const discountAmount = parseFloat(validatedData.discountAmount?.replace(/,/g, '') || '0') || 0
-    const total = subtotal - discountAmount
-    const discountPercentage = subtotal > 0 ? (discountAmount / subtotal) * 100 : 0
+    // Use the values already calculated by the frontend
+    const subtotal = validatedData.subtotal
+    const total = validatedData.total
+    const discountAmount = subtotal - total
+    const discountPercentage = validatedData.discountPercentage || 0
 
     // Insert quotation
     const insertData: QuotationInsert = {
