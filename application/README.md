@@ -6,13 +6,68 @@ Next.js 16 application for generating professional photography quotations for **
 
 ## Quick Start
 
+### 1. Install Dependencies
+
 ```bash
 npm install
+```
+
+### 2. Set Up Supabase
+
+Create a `.env.local` file in the `application` directory:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+```
+
+### 3. Create Database Tables
+
+Go to your Supabase dashboard → SQL Editor and run the migration script:
+
+```bash
+application/supabase/migrations/001_initial_schema.sql
+```
+
+This creates the `quotations` and `line_items` tables with all necessary indexes and constraints.
+
+### 4. Start Development Server
+
+```bash
 npm run dev
 # Open http://localhost:3000
 ```
 
-No `.env` setup needed — fully client-side, no backend.
+---
+
+## Database Schema
+
+The application uses Supabase (PostgreSQL) for persistent storage:
+
+### Tables
+
+**quotations**
+- `id` (uuid, primary key)
+- `created_at`, `updated_at` (timestamps)
+- `client_site_name` (text)
+- `shoot_type` (text)
+- `quotation_date` (date)
+- `discount_percentage`, `subtotal`, `discount_amount`, `total` (numeric)
+
+**line_items**
+- `id` (uuid, primary key)
+- `quotation_id` (uuid, foreign key → quotations)
+- `description` (text)
+- `photo_count`, `reel_video_count` (integer)
+- `price` (numeric)
+
+### API Routes
+
+- `POST /api/quotations` - Create new quotation
+- `GET /api/quotations` - List all quotations (paginated)
+- `GET /api/quotations/[id]` - Get single quotation
+- `PUT /api/quotations/[id]` - Update quotation
+- `DELETE /api/quotations/[id]` - Delete quotation
 
 ---
 
@@ -31,6 +86,11 @@ app/
 ├── page.tsx                        # Main SPA — mounts FormPanel + QuotationPreview
 ├── layout.tsx                      # Jost font, TDS metadata, logo favicon
 ├── globals.css                     # Tailwind base + @media print rules
+├── api/
+│   └── quotations/
+│       ├── route.ts                # POST (create) + GET (list) quotations
+│       └── [id]/
+│           └── route.ts            # GET, PUT, DELETE single quotation
 ├── components/
 │   ├── form/
 │   │   ├── FormPanel.tsx           # Left panel: all form inputs + download button
@@ -38,7 +98,13 @@ app/
 │   └── quotation/
 │       └── QuotationPreview.tsx    # Right panel: A4 quotation (also the print target)
 ├── lib/
-│   └── quotation-utils.ts          # calcTotal, formatMoney, formatInputDate, defaults
+│   ├── quotation-utils.ts          # calcTotal, formatMoney, formatInputDate, defaults
+│   └── supabase/
+│       ├── client.ts               # Supabase client singleton
+│       ├── database.types.ts       # TypeScript types from DB schema
+│       ├── validation.ts           # Zod schemas for API validation
+│       ├── transforms.ts           # DB ↔ App type conversions
+│       └── errors.ts               # Centralized error handling
 └── types/
     └── quotation.ts                # QuotationData, LineItem interfaces
 ```
@@ -51,7 +117,10 @@ app/
 |---|---|
 | Framework | Next.js 16 (App Router) |
 | Language | TypeScript (strict) |
+| Database | Supabase (PostgreSQL) |
 | Styling | Tailwind CSS + inline styles in QuotationPreview |
+| Validation | Zod |
+| State | Zustand |
 | Font | Jost via `next/font/google` |
 | PDF | `window.print()` + `@media print` CSS |
 
