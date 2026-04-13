@@ -1,19 +1,25 @@
 import { supabase } from '@/lib/supabase/client'
 import { updateQuotationSchema, quotationIdSchema } from '@/lib/supabase/validation'
 import { handleApiError } from '@/lib/supabase/errors'
+import type { Database } from '@/lib/supabase/database.types'
+
+type QuotationUpdate = Database['public']['Tables']['quotations']['Update']
+type LineItemInsert = Database['public']['Tables']['line_items']['Insert']
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+    
     // Validate ID
-    quotationIdSchema.parse(params.id)
+    quotationIdSchema.parse(id)
     
     const { data, error } = await supabase
       .from('quotations')
       .select('*, line_items(*)')
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
     
     if (error) throw error
@@ -32,11 +38,13 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+    
     // Validate ID
-    quotationIdSchema.parse(params.id)
+    quotationIdSchema.parse(id)
     
     const body = await request.json()
     const validatedData = updateQuotationSchema.parse(body)
@@ -52,19 +60,22 @@ export async function PUT(
     const discountPercentage = subtotal > 0 ? (discountAmount / subtotal) * 100 : 0
     
     // Update quotation
-    const { data: quotation, error: quotationError } = await supabase
+    const updateData: QuotationUpdate = {
+      client_site_name: validatedData.quotationFor,
+      shoot_type: validatedData.serviceType,
+      quotation_date: validatedData.date,
+      discount_percentage: discountPercentage,
+      subtotal,
+      discount_amount: discountAmount,
+      total,
+      updated_at: new Date().toISOString(),
+    }
+    
+    // Update quotation
+    const { data: quotation, error: quotationError } = await (supabase as any)
       .from('quotations')
-      .update({
-        client_site_name: validatedData.quotationFor,
-        shoot_type: validatedData.serviceType,
-        quotation_date: validatedData.date,
-        discount_percentage: discountPercentage,
-        subtotal,
-        discount_amount: discountAmount,
-        total,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', params.id)
+      .update(updateData)
+      .eq('id', id)
       .select()
       .single()
     
@@ -74,20 +85,21 @@ export async function PUT(
     const { error: deleteError } = await supabase
       .from('line_items')
       .delete()
-      .eq('quotation_id', params.id)
+      .eq('quotation_id', id)
     
     if (deleteError) throw deleteError
     
     // Insert new line items
-    const lineItemsToInsert = validatedData.items.map(item => ({
-      quotation_id: params.id,
+    const lineItemsToInsert: LineItemInsert[] = validatedData.items.map(item => ({
+      quotation_id: id,
       description: item.description,
       photo_count: parseInt(item.photos) || 0,
       reel_video_count: parseInt(item.reels) || 0,
       price: parseFloat(item.total.replace(/,/g, '')) || 0,
     }))
     
-    const { error: insertError } = await supabase
+    // Insert new line items
+    const { error: insertError } = await (supabase as any)
       .from('line_items')
       .insert(lineItemsToInsert)
     
@@ -100,17 +112,19 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+    
     // Validate ID
-    quotationIdSchema.parse(params.id)
+    quotationIdSchema.parse(id)
     
     const { error } = await supabase
       .from('quotations')
       .delete()
-      .eq('id', params.id)
+      .eq('id', id)
     
     if (error) throw error
     
