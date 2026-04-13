@@ -5,7 +5,7 @@ const lineItemSchema = z.object({
   description: z.string().min(1, 'Description is required'),
   photos: z.string(),
   reels: z.string(),
-  total: z.string().regex(/^\d{1,3}(,\d{3})*(\.\d{2})?$/, 'Invalid amount format'),
+  total: z.string(),
 })
 
 export const createQuotationSchema = z.object({

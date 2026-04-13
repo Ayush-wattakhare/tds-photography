@@ -40,17 +40,13 @@ export default function FormPanel({ data, onChange, onDownload, downloading }: P
       const payload = {
         quotationFor: data.quotationFor,
         serviceType: data.serviceType,
-        quotationDate: data.date,
-        items: data.items.map((item) => ({
-          description: item.description,
-          photoCount: parseInt(item.photos) || 0,
-          reelVideoCount: parseInt(item.reels) || 0,
-          price: parseFloat(item.total.replace(/,/g, '')) || 0,
-        })),
-        subtotal: rawTotal,
-        discountAmount: discountAmount,
+        date: data.date,
+        items: data.items,
+        discountAmount: data.discountAmount,
         discountPercentage: discountPercentage,
+        subtotal: rawTotal,
         total: finalTotal,
+        noteText: data.noteText,
       }
 
       const response = await fetch('/api/quotations', {
