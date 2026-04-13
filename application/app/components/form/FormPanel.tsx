@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
 import type { QuotationData, LineItem } from '../../types/quotation'
 import { calcTotal, formatMoney, newItem } from '../../lib/quotation-utils'
@@ -18,8 +19,59 @@ const INPUT =
 const LABEL = 'block text-[10px] font-semibold text-[#7A6A3E] uppercase tracking-widest mb-1.5'
 
 export default function FormPanel({ data, onChange, onDownload, downloading }: Props) {
+  const [saving, setSaving] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState(false)
+
   const set = <K extends keyof QuotationData>(key: K, value: QuotationData[K]) => {
     onChange({ ...data, [key]: value })
+  }
+
+  const handleSave = async () => {
+    setSaving(true)
+    setSaveSuccess(false)
+
+    try {
+      const rawTotal = calcTotal(data.items)
+      const discountAmt = parseFloat(data.discountAmount.replace(/,/g, ''))
+      const finalTotal = !isNaN(discountAmt) && discountAmt > 0 ? discountAmt : rawTotal
+      const discountAmount = !isNaN(discountAmt) && discountAmt > 0 ? rawTotal - discountAmt : 0
+      const discountPercentage = discountAmount > 0 ? (discountAmount / rawTotal) * 100 : 0
+
+      const payload = {
+        quotationFor: data.quotationFor,
+        serviceType: data.serviceType,
+        quotationDate: data.date,
+        items: data.items.map((item) => ({
+          description: item.description,
+          photoCount: parseInt(item.photos) || 0,
+          reelVideoCount: parseInt(item.reels) || 0,
+          price: parseFloat(item.total.replace(/,/g, '')) || 0,
+        })),
+        subtotal: rawTotal,
+        discountAmount: discountAmount,
+        discountPercentage: discountPercentage,
+        total: finalTotal,
+      }
+
+      const response = await fetch('/api/quotations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to save quotation')
+      }
+
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), 3000)
+    } catch (error) {
+      console.error('Error saving quotation:', error)
+      alert(error instanceof Error ? error.message : 'Failed to save quotation')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const updateItem = (id: string, field: keyof LineItem, value: string) => {
@@ -150,15 +202,25 @@ export default function FormPanel({ data, onChange, onDownload, downloading }: P
         />
       </div>
 
-      {/* Download */}
-      <button
-        type="button"
-        onClick={onDownload}
-        disabled={downloading}
-        className="w-full py-3 rounded-xl bg-[#7A6A3E] text-[#EEECE2] font-semibold text-sm tracking-widest uppercase hover:bg-[#8C7E5E] transition disabled:opacity-60 disabled:cursor-not-allowed shadow-md"
-      >
-        {downloading ? 'Generating PDF...' : 'Download PDF'}
-      </button>
+      {/* Save & Download Buttons */}
+      <div className="flex flex-col gap-2">
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving || !data.quotationFor || data.items.length === 0}
+          className="w-full py-3 rounded-xl bg-[#7A6A3E] text-[#EEECE2] font-semibold text-sm tracking-widest uppercase hover:bg-[#8C7E5E] transition disabled:opacity-60 disabled:cursor-not-allowed shadow-md"
+        >
+          {saving ? 'Saving...' : saveSuccess ? '✓ Saved!' : 'Save Quotation'}
+        </button>
+        <button
+          type="button"
+          onClick={onDownload}
+          disabled={downloading}
+          className="w-full py-3 rounded-xl bg-white border-2 border-[#7A6A3E] text-[#7A6A3E] font-semibold text-sm tracking-widest uppercase hover:bg-[#7A6A3E] hover:text-white transition disabled:opacity-60 disabled:cursor-not-allowed shadow-md"
+        >
+          {downloading ? 'Generating PDF...' : 'Download PDF'}
+        </button>
+      </div>
     </div>
   )
 }
