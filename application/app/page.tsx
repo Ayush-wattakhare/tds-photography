@@ -1,14 +1,23 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import FormPanel from './components/form/FormPanel'
 import QuotationPreview from './components/quotation/QuotationPreview'
+import LogoutButton from './components/LogoutButton'
+import { useQuotationStore } from '@/lib/quotation-store'
 import { defaultQuotation } from './lib/quotation-utils'
 import type { QuotationData } from './types/quotation'
 
 export default function Home() {
-  const [data, setData] = useState<QuotationData>(defaultQuotation)
+  const { quotationData, resetQuotation } = useQuotationStore()
+  const [data, setData] = useState<QuotationData>(quotationData)
+
+  // Sync with Zustand store when it changes
+  useEffect(() => {
+    setData(quotationData)
+  }, [quotationData])
   const [printing, setPrinting] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
   const previewRef = useRef<HTMLDivElement | null>(null)
@@ -33,13 +42,22 @@ export default function Home() {
             TDS Photography — Quotation Generator
           </span>
         </div>
-        <button
-          type="button"
-          className="lg:hidden text-[11px] font-medium text-[#8C7E5E] border border-[#C8BFAA]/60 px-3 py-1.5 rounded-lg hover:bg-[#B5A98A]/20 transition"
-          onClick={() => setShowPreview((v) => !v)}
-        >
-          {showPreview ? 'Edit Form' : 'Preview'}
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/history"
+            className="text-[11px] font-medium text-[#8C7E5E] border border-[#C8BFAA]/60 px-3 py-1.5 rounded-lg hover:bg-[#B5A98A]/20 transition"
+          >
+            History
+          </Link>
+          <LogoutButton />
+          <button
+            type="button"
+            className="lg:hidden text-[11px] font-medium text-[#8C7E5E] border border-[#C8BFAA]/60 px-3 py-1.5 rounded-lg hover:bg-[#B5A98A]/20 transition"
+            onClick={() => setShowPreview((v) => !v)}
+          >
+            {showPreview ? 'Edit Form' : 'Preview'}
+          </button>
+        </div>
       </div>
 
       {/* ── Main layout — NOT no-print, so the preview remains visible during print ── */}

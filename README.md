@@ -20,7 +20,10 @@ Enter the client's site name, shoot type, date, and add line items — each with
 **2. See it live**
 The quotation preview updates in real time on the right side — exactly how it'll look when printed.
 
-**3. Download as PDF**
+**3. Save to database**
+All quotations are automatically saved to Supabase, so you can access them anytime and maintain a complete history.
+
+**4. Download as PDF**
 One click opens the print dialog. Save as PDF and it's ready to send to the client.
 
 ---
@@ -34,6 +37,18 @@ One click opens the print dialog. Save as PDF and it's ready to send to the clie
 - Optional discount with original price shown as strikethrough
 - Standard note about travel and accommodation
 - Footer with brand links and contact details
+- Persistent storage in Supabase database for quotation history
+
+---
+
+## Tech Stack
+
+- **Frontend**: Next.js 16 (App Router) with TypeScript
+- **Styling**: Tailwind CSS
+- **Database**: Supabase (PostgreSQL)
+- **State Management**: Zustand
+- **Validation**: Zod
+- **PDF Generation**: Browser print with CSS
 
 ---
 
